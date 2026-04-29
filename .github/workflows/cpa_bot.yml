@@ -1,0 +1,49 @@
+name: USA_CPA_MONEY_MACHINE
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  run_bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install System Tools
+        run: |
+          pip install playwright
+          playwright install chromium
+
+      - name: Execute USA Bot
+        run: |
+          python - <<EOF
+          import asyncio
+          from playwright.async_api import async_playwright
+          import random
+
+          async def run_mission():
+              async with async_playwright() as p:
+                  browser = await p.chromium.launch(headless=True)
+                  context = await browser.new_context(
+                      user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+                      viewport={'width': 1920, 'height': 1080}
+                  )
+                  page = await context.new_page()
+                  
+                  target_url = "https://singingfiles.com/show.php?l=0&u=2345977&id=73209"
+                  
+                  print("Bot starting USA session...")
+                  await page.goto(target_url, wait_until="networkidle")
+                  
+                  for i in range(4):
+                      scroll_amount = random.randint(400, 900)
+                      await page.mouse.wheel(0, scroll_amount)
+                      await asyncio.sleep(random.randint(4, 8))
+                  
+                  print("Task finished successfully.")
+                  await browser.close()
+
+          asyncio.run(run_mission())
+          EOF
