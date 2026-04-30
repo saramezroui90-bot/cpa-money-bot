@@ -18,21 +18,20 @@ async function run() {
         const smartLink = 'https://omg10.com/4/10947636';
         await page.goto(smartLink, { waitUntil: 'networkidle2', timeout: 60000 });
 
-        await new Promise(r => setTimeout(r, 40000));
+        const randomWait = Math.floor(Math.random() * (50000 - 30000 + 1) + 30000);
+        await new Promise(r => setTimeout(r, randomWait));
 
         await page.evaluate(() => {
-            window.scrollBy(0, window.innerHeight / 2);
+            window.scrollBy(0, Math.floor(Math.random() * 500));
         });
-        await new Promise(r => setTimeout(r, 5000));
 
         const element = await page.$('a') || await page.$('button');
         if (element) {
             await element.click();
-            await new Promise(r => setTimeout(r, 10000));
+            await new Promise(r => setTimeout(r, 5000));
         }
 
     } catch (e) {
-        // Error ignored
     } finally {
         await browser.close();
     }
