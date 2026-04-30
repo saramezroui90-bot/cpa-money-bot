@@ -1,29 +1,19 @@
-name: USA_CPA_MONEY_MACHINE_NONSTOP
-
+name: BotArmy
 on:
-  workflow_dispatch:
   schedule:
-    - cron: '0 */6 * * *'
-
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
 jobs:
-  run_bot:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        worker: [1, 2, 3, 4, 5]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
         with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm install puppeteer-core
-
-      - name: Execution Loop
-        run: |
-          end=$((SECONDS+20000)) 
-          while [ $SECONDS -lt $end ]; do
-            node cpa_bot.js
-            sleep 600
-          done
+          node-version: '16'
+      - run: npm install puppeteer-core
+      - run: node cpa_bot.js
