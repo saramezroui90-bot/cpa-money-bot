@@ -1,7 +1,7 @@
 name: Monetag 24/7 Bot
 on:
   schedule:
-    - cron: '*/2 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
