@@ -1,34 +1,45 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+puppeteer.use(StealthPlugin());
 
 async function runHustle() {
   const browser = await puppeteer.launch({
     headless: "new",
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-blink-features=AutomationControlled',
+      '--lang=en-US,en'
+    ]
   });
   const page = await browser.newPage();
 
-  // American Identity Setup
-  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36');
+  // Set US Identity
+  await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
+  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36');
 
   try {
-    console.log("Starting Automation...");
-    await page.goto('https://sproutgigs.com/login.php', { waitUntil: 'domcontentloaded', timeout: 60000 });
+    console.log("American Citizen Mode Activated...");
+    await page.goto('https://sproutgigs.com/login.php', { waitUntil: 'networkidle2' });
 
-    // Wait for the login fields
-    await page.waitForSelector('#email', { timeout: 30000 });
+    await page.waitForSelector('#email', { timeout: 60000 });
     
-    // Injecting Secrets from GitHub
-    await page.type('#email', process.env.SPROUT_EMAIL);
-    await page.type('#password', process.env.SPROUT_PASS);
+    // Human-like mouse movement
+    await page.mouse.move(100, 100);
+    await page.mouse.move(200, 300);
+
+    // Typing with human delay
+    await page.type('#email', process.env.SPROUT_EMAIL, { delay: 200 });
+    await page.type('#password', process.env.SPROUT_PASS, { delay: 250 });
     
-    console.log("Details entered, clicking login...");
+    console.log("Clicking Login...");
     await page.click('#submit-btn');
 
     await page.waitForNavigation({ waitUntil: 'networkidle2' });
-    console.log("Login Successful! Bot is now working...");
+    console.log("Success! Working invisible.");
 
   } catch (error) {
-    console.error("The bot hit a wall: " + error.message);
+    console.error("Critical Error: " + error.message);
     process.exit(1);
   }
 }
