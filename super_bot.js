@@ -7,25 +7,28 @@ async function runHustle() {
   });
   const page = await browser.newPage();
 
-  // American Identity
+  // American Identity Setup
   await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36');
 
   try {
     console.log("Starting Automation...");
-    await page.goto('https://sproutgigs.com/login.php', { waitUntil: 'networkidle2' });
+    await page.goto('https://sproutgigs.com/login.php', { waitUntil: 'domcontentloaded', timeout: 60000 });
 
-    // Reading from Secrets
+    // Wait for the login fields
+    await page.waitForSelector('#email', { timeout: 30000 });
+    
+    // Injecting Secrets from GitHub
     await page.type('#email', process.env.SPROUT_EMAIL);
     await page.type('#password', process.env.SPROUT_PASS);
     
-    await Promise.all([
-      page.click('#submit-btn'),
-      page.waitForNavigation({ waitUntil: 'networkidle2' }),
-    ]);
+    console.log("Details entered, clicking login...");
+    await page.click('#submit-btn');
 
-    console.log("Login Successful - Hunting for tasks...");
+    await page.waitForNavigation({ waitUntil: 'networkidle2' });
+    console.log("Login Successful! Bot is now working...");
+
   } catch (error) {
-    console.error("Connection issue, retrying...");
+    console.error("The bot hit a wall: " + error.message);
     process.exit(1);
   }
 }
