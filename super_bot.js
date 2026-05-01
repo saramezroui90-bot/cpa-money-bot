@@ -14,32 +14,29 @@ async function runHustle() {
   });
   const page = await browser.newPage();
 
-  // Set US Identity
   await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
   await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36');
 
   try {
-    console.log("American Citizen Mode Activated...");
+    console.log("Status: Initialization");
     await page.goto('https://sproutgigs.com/login.php', { waitUntil: 'networkidle2' });
 
     await page.waitForSelector('#email', { timeout: 60000 });
     
-    // Human-like mouse movement
     await page.mouse.move(100, 100);
-    await page.mouse.move(200, 300);
+    await page.mouse.move(200, 200);
 
-    // Typing with human delay
     await page.type('#email', process.env.SPROUT_EMAIL, { delay: 200 });
     await page.type('#password', process.env.SPROUT_PASS, { delay: 250 });
     
-    console.log("Clicking Login...");
+    console.log("Status: Submitting Credentials");
     await page.click('#submit-btn');
 
     await page.waitForNavigation({ waitUntil: 'networkidle2' });
-    console.log("Success! Working invisible.");
+    console.log("Status: Automation Success");
 
   } catch (error) {
-    console.error("Critical Error: " + error.message);
+    console.error("Error Log: " + error.message);
     process.exit(1);
   }
 }
